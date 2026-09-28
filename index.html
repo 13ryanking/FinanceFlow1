@@ -15,7 +15,7 @@
             --muted: #6B6455;
             --green: #3D6B52;
             --rust:  #9C4A2E;
-            --gold : #B8862F;
+            --gold: #B8862F;
 
         }
 
@@ -49,6 +49,40 @@
             margin: 0 0 22px;
             font-size: 0.92rem;
         }
+
+        .summary {
+            display: flex;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            margin-bottom: 26px;
+            overflow: hidden;
+
+        }
+
+        .sum-cell {
+            flex: 1;
+            padding: 14px 16px;
+            border-right: 1px solid var(--line);
+
+        }
+
+        .sum-cell:last-child { border-right: none; }
+
+        .sum-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .sum-val {
+            font-family: 'Source Serif 4', serif;
+            font-size: 1.35rem;
+            font-weight: 600
+        }
+
+        .sum-val.income  { color: var(--green); }
+        .sum-val.expense { color: var(--rust); }
+
     </style>
 </head>
 <body>
