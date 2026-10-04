@@ -83,6 +83,62 @@
         .sum-val.income  { color: var(--green); }
         .sum-val.expense { color: var(--rust); }
 
+                section { margin-bottom: 30px; }
+
+        h2 {
+            font-family: 'Source Serif 4', serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 0 0 12px;
+        }
+
+        form.entry {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field label {
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        .field input, .field select {
+            font-family: 'IBM Plex Sans';
+            font-size: 0.9rem;
+            padding: 7px 8px;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            background: var(--card);
+            color: var(--ink);
+        }
+
+        .field.grow { flex: 1; min-width: 140px; }
+        .field.date { width: 130px; }
+        .field.amt  { width: 100px; }
+        .field.type select, .field.cat select { width: 120px; }
+
+        button.add {
+            background: var(--ink);
+            color: var(--paper);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 2px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans';
+            font-weight: 500;
+        }
+
+        button.add:hover { opacity: 0.88; }
+
 
     </style>
 </head>
@@ -93,19 +149,57 @@
                 <div class="summary">
             <div class="sum-cell">
                 <div class="sum-label">Revenue</div>
-                <div class="sum-val income" id="sumIncome">$0.00</div>
+                <div class="sum-val income" id="sumIncome">£0.00</div>
             </div>
             <div class="sum-cell">
                 <div class="sum-label">Costs</div>
-                <div class="sum-val expense" id="sumExpense">$0.00</div>
+                <div class="sum-val expense" id="sumExpense">£0.00</div>
             </div>
             <div class="sum-cell">
                 <div class="sum-label">Net</div>
-                <div class="sum-val" id="sumNet">$0.00</div>
+                <div class="sum-val" id="sumNet">£0.00</div>
             </div>
         </div>
-            
-        </div>
+
+        <section>
+            <h2>Add an entry</h2>
+            <form class="entry" id="entryForm">
+                <div class="field date">
+                    <label>Date</label>
+                    <input type="date" id="fDate" required>
+                </div>
+                <div class="field grow">
+                    <label>Description</label>
+                    <input type="text" id="fDesc" placeholder="e.g. Office supplies" required>
+                </div>
+                <div class="field type">
+                    <label>Type</label>
+                    <select id="fType">
+                        <option value="expense">Cost</option>
+                        <option value="income">Revenue</option>
+                    </select>
+                </div>
+                <div class="field cat">
+                    <label>Category</label>
+                    <select id="fCat">
+                        <option value="Payroll">Payroll</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Supplies">Supplies</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Software">Software</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Taxes">Taxes</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="field amt">
+                    <label>Amount</label>
+                    <input type="number" id="fAmt" step="0.01" min="0" placeholder="0.00" required>
+                </div>
+                <button class="add" type="submit">Add</button>
+            </form>
+        </section>
+        
     </div>
 </body>
 </html>
