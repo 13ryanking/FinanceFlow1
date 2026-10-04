@@ -83,12 +83,29 @@
         .sum-val.income  { color: var(--green); }
         .sum-val.expense { color: var(--rust); }
 
+
     </style>
 </head>
 <body>
     <div class="wrap">
         <h1>Finance Flow</h1>
-        <p class="sub">A running record of where the business's money goes</p>
+        <p class="sub">A running record of cash flow</p>
+                <div class="summary">
+            <div class="sum-cell">
+                <div class="sum-label">Revenue</div>
+                <div class="sum-val income" id="sumIncome">$0.00</div>
+            </div>
+            <div class="sum-cell">
+                <div class="sum-label">Costs</div>
+                <div class="sum-val expense" id="sumExpense">$0.00</div>
+            </div>
+            <div class="sum-cell">
+                <div class="sum-label">Net</div>
+                <div class="sum-val" id="sumNet">$0.00</div>
+            </div>
+        </div>
+            
+        </div>
     </div>
 </body>
 </html>
