@@ -10,6 +10,27 @@
 </head>
 <body>
     <div class="wrap">
+        <div id="authScreen">
+            <h2 id="authTitle">Log in</h2>
+            <form id="authForm">
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" id="authEmail" required>
+                </div>
+                <div class="field">
+                    <label>Password</label>
+                    <input type="password" id="authPassword" required minlength="6">
+                </div>
+                <button type="submit" id="authSubmit">Log in</button>
+                <div id="authError"></div>
+            </form>
+            <button id="authToggle" type="button">Need an account? Sign up</button>
+        </div>
+        
+        <div id="appContent">
+            <button id="logoutBtn" type="button">Log out</button>
+        
+
         <h1>Finance Flow</h1>
         <p class="sub">A running record of cash flow</p>
                 <div class="summary">
@@ -65,7 +86,7 @@
                 <button class="add" type="submit">Add</button>
             </form>
         </section>
-        
+
         <section>
             <h2>Costs by category</h2>
             <div class="bars" id="bars"></div>
@@ -77,6 +98,7 @@
         </section>
 
 
+        </div>
     </div>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
