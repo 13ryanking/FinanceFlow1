@@ -11,6 +11,46 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+let isLoginMode = true;
+
+document.getElementById('authToggle').addEventListener('click', () => {
+    isLoginMode = !isLoginMode;
+    document.getElementById('authTitle').textContent = isLoginMode ? 'Log in' : 'Sign up';
+    document.getElementById('authSubmit').textContent = isLoginMode ? 'Log in' : 'Sign up';
+    document.getElementById('authToggle').textContent = isLoginMode ? 'Need an account? Sign up' : 'Already have an account? Log in';
+    document.getElementById('authError').textContent = '';
+});
+
+document.getElementById('authForm').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const errorEl = document.getElementById('authError');
+    errorEl.textContent = '';
+
+    const action = isLoginMode
+        ? auth.signInWithEmailAndPassword(email, password)
+        : auth.createUserWithEmailAndPassword(email, password);
+
+    action.catch((err) => {
+        errorEl.textContent = err.message;
+    });
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    auth.signOut();
+});
+
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+    } else {
+        document.getElementById('authScreen').style.display = 'block';
+        document.getElementById('appContent').style.display = 'none';
+    }
+});
+
 const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Travel', 'Taxes', 'Other'];
         const INCOME_CAT = 'Revenue';
         let entries = [];
