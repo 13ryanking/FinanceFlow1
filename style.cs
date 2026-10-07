@@ -1,0 +1,205 @@
+ :root {
+            --ink: #1A2A33;
+            --paper: #F1EEE6;
+            --card: #FBF9F4;
+            --line: #D2CBB8;
+            --muted: #6B6455;
+            --green: #3D6B52;
+            --rust:  #9C4A2E;
+            --gold: #B8862F;
+
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .wrap {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 28px 20px 60px;
+
+        }
+
+        h1 {
+            font-family: 'Source Serif 4', serif;
+            font-weight: 600;
+            font-size: 1.9rem;
+            margin: 0 0 2px;
+        }
+
+        .sub { 
+            color: var(--muted);
+            margin: 0 0 22px;
+            font-size: 0.92rem;
+        }
+
+        .summary {
+            display: flex;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            margin-bottom: 26px;
+            overflow: hidden;
+
+        }
+
+        .sum-cell {
+            flex: 1;
+            padding: 14px 16px;
+            border-right: 1px solid var(--line);
+
+        }
+
+        .sum-cell:last-child { border-right: none; }
+
+        .sum-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .sum-val {
+            font-family: 'Source Serif 4', serif;
+            font-size: 1.35rem;
+            font-weight: 600
+        }
+
+        .sum-val.income  { color: var(--green); }
+        .sum-val.expense { color: var(--rust); }
+
+                section { margin-bottom: 30px; }
+
+        h2 {
+            font-family: 'Source Serif 4', serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin: 0 0 12px;
+        }
+
+        form.entry {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .field label {
+            font-size: 0.72rem;
+            color: var(--muted);
+        }
+
+        .field input, .field select {
+            font-family: 'IBM Plex Sans';
+            font-size: 0.9rem;
+            padding: 7px 8px;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            background: var(--card);
+            color: var(--ink);
+        }
+
+        .field.grow { flex: 1; min-width: 140px; }
+        .field.date { width: 130px; }
+        .field.amt  { width: 100px; }
+        .field.type select, .field.cat select { width: 120px; }
+
+        button.add {
+            background: var(--ink);
+            color: var(--paper);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 2px;
+            font-size: 0.88rem;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans';
+            font-weight: 500;
+        }
+
+        button.add:hover { opacity: 0.88; }
+
+                .bars {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bar-label {
+            width: 110px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            flex-shrink: 0;
+        }
+
+        .bar-track {
+            flex: 1;
+            height: 9px;
+            background: var(--card);
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: var(--rust);
+            border-radius: 1px;
+        }
+
+        .bar-amt {
+            width: 70px;
+            text-align: right;
+            font-size: 0.82rem;
+        }
+
+        .empty {
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-style: italic;
+        }
+
+        .ledger-list { border-top: 1px solid var(--line); }
+
+        .tx-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line);
+            font-size: 0.88rem;
+        }
+
+        .tx-date { width: 78px; color: var(--muted); flex-shrink: 0; }
+        .tx-desc { flex: 1; min-width: 0; }
+        .tx-cat  { width: 100px; color: var(--muted); flex-shrink: 0; font-size: 0.8rem; }
+        .tx-amt  { width: 90px; text-align: right; flex-shrink: 0; }
+        .tx-amt.income  { color: var(--green); }
+        .tx-amt.expense { color: var(--rust); }
+
+        .tx-del {
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+
+        .tx-del:hover { color: var(--rust); }
