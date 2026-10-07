@@ -289,6 +289,24 @@
 
 
     </div>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDv2mmwJOutr4OXSPNaHdF6Aq_7imABZY4",
+            authDomain: "financeflow-991b2.firebaseapp.com",
+            projectId: "financeflow-991b2",
+            storageBucket: "financeflow-991b2.firebasestorage.app",
+            messagingSenderId: "193102453180",
+            appId: "1:193102453180:web:0ba6b9f3884e342cac33b9"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
         <script>
         const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Travel', 'Taxes', 'Other'];
         const INCOME_CAT = 'Revenue';
@@ -409,6 +427,7 @@
         document.getElementById('fDate').valueAsDate = new Date();
         load();
         render();
+        console.log("Firebase apps connected:", firebase.apps.length)
     </script>
 
 
