@@ -54,6 +54,26 @@ auth.onAuthStateChanged((user) => {
 const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Travel', 'Taxes', 'Other'];
         const INCOME_CAT = 'Revenue';
         let entries = [];
+        let budget = null;
+
+        function loadBudget() {
+            try {
+                const raw = localStorage.getItem('financeflow_budget');
+                const n = parseFloat(raw);
+                budget = isNaN(n) ? null : n;
+            } catch (e) {
+                console.warn('budget load failed', e);
+            }
+        }
+
+        function saveBudget() {
+            try {
+                if (budget === null) localStorage.removeItem('financeflow_budget');
+                else localStorage.setItem('financeflow_budget', String(budget));
+            } catch (e) {
+                console.warn('budget save failed', e);
+            }
+        }
 
         function load() {
             try {
@@ -122,6 +142,12 @@ const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Tra
 
             document.getElementById('sumIncome').textContent = fmt(income);
             document.getElementById('sumExpense').textContent = fmt(expense);
+            const warnEl = document.getElementById('budgetWarn');
+            if (budget !== null && expense > budget) {
+                warnEl.textContent = `Over budget by ${fmt(expense - budget)}`;
+            } else {
+                warnEl.textContent = '';
+            }
             const net = income - expense;
             const netEl = document.getElementById('sumNet');
             netEl.textContent = (net < 0 ? '-' : '') + fmt(Math.abs(net));
@@ -204,4 +230,13 @@ const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Tra
 
         document.getElementById('fDate').valueAsDate = new Date();
         load();
+        loadBudget();
+        const budgetEl = document.getElementById('budgetInput');
+        if (budget !== null) budgetEl.value = budget;
+        budgetEl.addEventListener('input', () => {
+            const v = parseFloat(budgetEl.value);
+            budget = (isNaN(v) || v <= 0) ? null : v;
+            saveBudget();
+            render();
+        });
         render();
