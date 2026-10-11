@@ -132,6 +132,10 @@ const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Tra
                 listEl.querySelectorAll('.tx-del').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const id = Number(btn.dataset.id);
+                        const entry = entries.find(e => e.id === id);
+                        const ok = confirm(`Delete "${entry.desc}" (${fmt(entry.amount)})? This can't be undone.`);
+                        if (!ok) return;
+
                         entries = entries.filter(e => e.id !== id);
                         save();
                         render();
