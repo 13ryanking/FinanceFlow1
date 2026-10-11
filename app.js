@@ -20,6 +20,27 @@ let customList = [];
 let entries = [];
 let budget = null;
 
+// ---------- Firestore ----------
+function userRef() {
+    return db.collection('users').doc(currentUid);
+}
+
+async function loadUserData(uid) {
+    const ref = db.collection('users').doc(uid);
+    const [profile, entriesSnap] = await Promise.all([
+        ref.get(),
+        ref.collection('entries').get()
+    ]);
+    const data = profile.exists ? profile.data() : {};
+    entries = entriesSnap.docs.map(d => d.data());
+    budget = typeof data.budget === 'number' ? data.budget : null;
+    return Array.isArray(data.categories) && data.categories.length ? data.categories : null;
+}
+
+function notifyError(message) {
+    return showConfirm('Something went wrong', message, 'OK');
+}
+
 // ---------- Auth ----------
 let isLoginMode = true;
 
@@ -51,44 +72,40 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     auth.signOut();
 });
 
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
     if (!user) {
         currentUid = null;
+        entries = [];
+        budget = null;
+        categories = [...DEFAULT_CATEGORIES];
         showScreen('auth');
         return;
     }
+
     currentUid = user.uid;
-    const saved = loadCategories(user.uid);
-    if (saved) {
-        categories = saved;
-        populateCategorySelect();
-        render();
-        showScreen('app');
-    } else {
-        openSetup();
-        showScreen('setup');
+    try {
+        const saved = await loadUserData(user.uid);
+        if (currentUid !== user.uid) return; // someone else logged in meanwhile
+
+        document.getElementById('budgetInput').value = budget === null ? '' : budget;
+
+        if (saved) {
+            categories = saved;
+            populateCategorySelect();
+            render();
+            showScreen('app');
+        } else {
+            openSetup();
+            showScreen('setup');
+        }
+    } catch (e) {
+        console.error('Failed to load data', e);
+        document.getElementById('authError').textContent = 'Could not load your data. Check your connection and try again.';
+        auth.signOut();
     }
 });
 
 // ---------- Categories ----------
-function loadCategories(uid) {
-    try {
-        const raw = localStorage.getItem('financeflow_categories_' + uid);
-        const arr = raw ? JSON.parse(raw) : null;
-        return Array.isArray(arr) && arr.length ? arr : null;
-    } catch (e) {
-        return null;
-    }
-}
-
-function saveCategories(uid, arr) {
-    try {
-        localStorage.setItem('financeflow_categories_' + uid, JSON.stringify(arr));
-    } catch (e) {
-        console.warn('categories save failed', e);
-    }
-}
-
 function populateCategorySelect() {
     const sel = document.getElementById('fCat');
     sel.innerHTML = '';
@@ -169,7 +186,7 @@ document.getElementById('customInput').addEventListener('keydown', (ev) => {
     if (ev.key === 'Enter') { ev.preventDefault(); addCustomCategory(); }
 });
 
-document.getElementById('setupSave').addEventListener('click', () => {
+document.getElementById('setupSave').addEventListener('click', async () => {
     const isCustom = document.querySelector('input[name="catMode"]:checked').value === 'custom';
     const errorEl = document.getElementById('setupError');
 
@@ -178,50 +195,21 @@ document.getElementById('setupSave').addEventListener('click', () => {
         return;
     }
 
-    categories = isCustom ? [...customList] : [...DEFAULT_CATEGORIES];
-    saveCategories(currentUid, categories);
+    const newCats = isCustom ? [...customList] : [...DEFAULT_CATEGORIES];
+
+    try {
+        await userRef().set({ categories: newCats }, { merge: true });
+    } catch (e) {
+        console.error('Failed to save categories', e);
+        errorEl.textContent = 'Could not save. Please try again.';
+        return;
+    }
+
+    categories = newCats;
     populateCategorySelect();
     render();
     showScreen('app');
 });
-
-// ---------- Budget ----------
-function loadBudget() {
-    try {
-        const raw = localStorage.getItem('financeflow_budget');
-        const n = parseFloat(raw);
-        budget = isNaN(n) ? null : n;
-    } catch (e) {
-        console.warn('budget load failed', e);
-    }
-}
-
-function saveBudget() {
-    try {
-        if (budget === null) localStorage.removeItem('financeflow_budget');
-        else localStorage.setItem('financeflow_budget', String(budget));
-    } catch (e) {
-        console.warn('budget save failed', e);
-    }
-}
-
-// ---------- Transactions storage ----------
-function load() {
-    try {
-        const raw = localStorage.getItem('financeflow_data');
-        if (raw) entries = JSON.parse(raw);
-    } catch (e) {
-        console.warn('load failed', e);
-    }
-}
-
-function save() {
-    try {
-        localStorage.setItem('financeflow_data', JSON.stringify(entries));
-    } catch (e) {
-        console.warn('save failed', e);
-    }
-}
 
 // ---------- Helpers ----------
 function fmt(n) {
@@ -326,8 +314,15 @@ function render() {
                 );
                 if (!ok) return;
 
+                try {
+                    await userRef().collection('entries').doc(String(id)).delete();
+                } catch (e) {
+                    console.error('Failed to delete', e);
+                    notifyError('The transaction could not be deleted. Please try again.');
+                    return;
+                }
+
                 entries = entries.filter(e => e.id !== id);
-                save();
                 render();
             });
         });
@@ -335,7 +330,7 @@ function render() {
 }
 
 // ---------- Add entry ----------
-document.getElementById('entryForm').addEventListener('submit', (ev) => {
+document.getElementById('entryForm').addEventListener('submit', async (ev) => {
     ev.preventDefault();
     const dateEl = document.getElementById('fDate');
     const descEl = document.getElementById('fDesc');
@@ -346,34 +341,48 @@ document.getElementById('entryForm').addEventListener('submit', (ev) => {
 
     if (!dateEl.value || !descEl.value || isNaN(amount) || amount <= 0) return;
 
-    entries.push({
+    const entry = {
         id: Date.now(),
         date: dateEl.value,
         desc: descEl.value,
         type: typeEl.value,
         category: typeEl.value === 'income' ? INCOME_CAT : catEl.value,
         amount: amount
-    });
+    };
 
-    save();
+    try {
+        await userRef().collection('entries').doc(String(entry.id)).set(entry);
+    } catch (e) {
+        console.error('Failed to save entry', e);
+        notifyError('The transaction could not be saved. Please try again.');
+        return;
+    }
+
+    entries.push(entry);
     render();
     descEl.value = '';
     amtEl.value = '';
     descEl.focus();
 });
 
-// ---------- Init ----------
-document.getElementById('fDate').valueAsDate = new Date();
-load();
-loadBudget();
-
+// ---------- Budget ----------
 const budgetEl = document.getElementById('budgetInput');
-if (budget !== null) budgetEl.value = budget;
+
 budgetEl.addEventListener('input', () => {
     const v = parseFloat(budgetEl.value);
     budget = (isNaN(v) || v <= 0) ? null : v;
-    saveBudget();
     render();
 });
 
+budgetEl.addEventListener('change', async () => {
+    try {
+        await userRef().set({ budget: budget }, { merge: true });
+    } catch (e) {
+        console.error('Failed to save budget', e);
+        notifyError('Your budget could not be saved. Please try again.');
+    }
+});
+
+// ---------- Init ----------
+document.getElementById('fDate').valueAsDate = new Date();
 render();
