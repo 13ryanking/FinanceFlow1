@@ -514,3 +514,19 @@
 }
 
 .export-btn:hover { border-color: var(--gold); }
+
+@media (max-width: 560px) {
+    .summary { flex-wrap: wrap; }
+    .sum-cell { flex: 1 1 50%; }
+    .sum-cell:nth-child(2n) { border-right: none; }
+    .sum-cell:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+
+    .tx-cat {
+        width: 64px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tx-amt { width: 80px; }
+}
