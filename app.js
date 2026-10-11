@@ -49,6 +49,12 @@ document.getElementById('authToggle').addEventListener('click', () => {
     document.getElementById('authTitle').textContent = isLoginMode ? 'Log in' : 'Sign up';
     document.getElementById('authSubmit').textContent = isLoginMode ? 'Log in' : 'Sign up';
     document.getElementById('authToggle').textContent = isLoginMode ? 'Need an account? Sign up' : 'Already have an account? Log in';
+
+    const confirmInput = document.getElementById('authConfirm');
+    document.getElementById('confirmField').style.display = isLoginMode ? 'none' : 'block';
+    confirmInput.required = !isLoginMode;
+    confirmInput.value = '';
+
     document.getElementById('authError').textContent = '';
 });
 
@@ -58,6 +64,14 @@ document.getElementById('authForm').addEventListener('submit', (ev) => {
     const password = document.getElementById('authPassword').value;
     const errorEl = document.getElementById('authError');
     errorEl.textContent = '';
+
+    if (!isLoginMode) {
+        const confirmPw = document.getElementById('authConfirm').value;
+        if (password !== confirmPw) {
+            errorEl.textContent = 'Passwords do not match.';
+            return;
+        }
+    }
 
     const action = isLoginMode
         ? auth.signInWithEmailAndPassword(email, password)
@@ -301,7 +315,8 @@ function render() {
                 <div class="tx-cat">${escapeHtml(e.category)}</div>
                 <div class="tx-amt ${e.type}">${e.type === 'income' ? '+' : '−'}${fmt(e.amount)}</div>
                 <button class="tx-del" data-id="${e.id}" title="Delete">✕</button>
-            </div>`).join('');
+            
+                </div>`).join('');
 
         listEl.querySelectorAll('.tx-del').forEach(btn => {
             btn.addEventListener('click', async () => {
