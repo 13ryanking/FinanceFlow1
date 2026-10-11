@@ -271,3 +271,63 @@
 }
 
 #appContent { display: none; }
+
+#confirmOverlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 42, 51, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+}
+
+#confirmOverlay.show { display: flex; }
+
+.confirm-box {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 22px;
+    max-width: 340px;
+    width: 100%;
+}
+
+.confirm-box h3 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.05rem;
+    margin: 0 0 8px;
+}
+
+.confirm-box p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin: 0 0 18px;
+}
+
+.confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.confirm-actions button {
+    padding: 8px 14px;
+    border-radius: 2px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'IBM Plex Sans';
+}
+
+#confirmCancel {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink);
+}
+
+#confirmOk {
+    background: var(--rust);
+    border: 1px solid var(--rust);
+    color: #fff;
+}

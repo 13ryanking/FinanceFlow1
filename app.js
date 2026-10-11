@@ -81,6 +81,32 @@ const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Tra
             return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
 
+        function showConfirm(title, message, okLabel) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('confirmOverlay');
+                const okBtn = document.getElementById('confirmOk');
+                const cancelBtn = document.getElementById('confirmCancel');
+
+                document.getElementById('confirmTitle').textContent = title;
+                document.getElementById('confirmMessage').textContent = message;
+                okBtn.textContent = okLabel || 'Confirm';
+                overlay.classList.add('show');
+
+                function close(result) {
+                    overlay.classList.remove('show');
+                    okBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                    overlay.onclick = null;
+                    resolve(result);
+                }
+
+                okBtn.onclick = () => close(true);
+                cancelBtn.onclick = () => close(false);
+                overlay.onclick = (ev) => { if (ev.target === overlay) close(false); };
+            }); 
+        }
+
+
         function render() {
             let income = 0, expense = 0;
             const catTotals = {};
@@ -129,11 +155,16 @@ const CATEGORIES = ['Payroll', 'Rent', 'Supplies', 'Marketing', 'Software', 'Tra
                         <button class="tx-del" data-id="${e.id}" title="Delete">✕</button>
                     </div>`).join('');
 
+                
                 listEl.querySelectorAll('.tx-del').forEach(btn => {
-                    btn.addEventListener('click', () => {
+                    btn.addEventListener('click', async () => {
                         const id = Number(btn.dataset.id);
                         const entry = entries.find(e => e.id === id);
-                        const ok = confirm(`Delete "${entry.desc}" (${fmt(entry.amount)})? This can't be undone.`);
+                        const ok = await showConfirm(
+                            'Delete transaction?',
+                            `"${entry.desc}" (${fmt(entry.amount)}) will be removed. This can't be undone.`,
+                            'Delete'
+                        );
                         if (!ok) return;
 
                         entries = entries.filter(e => e.id !== id);
