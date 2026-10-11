@@ -3,7 +3,7 @@
 <head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title> Finance FLow - Small Business Budgeting Tool</title>
+    <title> Finance Flow - Small Business Budgeting Tool</title>
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css"> 
 
@@ -26,6 +26,31 @@
             </form>
             <button id="authToggle" type="button">Need an account? Sign up</button>
         </div>
+        <div id="setupScreen">
+            <h2>Set up your categories</h2>
+            <p class="setup-note">Categories group your costs, like Rent or Payroll. You only do this once.</p>
+
+            <label class="radio-row">
+                <input type="radio" name="catMode" value="default" checked> Use the default categories
+            </label>
+            <div class="chip-list" id="defaultPreview"></div>
+
+            <label class="radio-row">
+                <input type="radio" name="catMode" value="custom"> Create my own
+            </label>
+            <div id="customBox">
+                <div class="custom-add">
+                    <input type="text" id="customInput" maxlength="24" placeholder="e.g. Equipment">
+                    <button type="button" id="customAddBtn">Add</button>
+                </div>
+                <div class="chip-list" id="customChips"></div>
+            </div>
+
+            <div id="setupError"></div>
+            <button type="button" id="setupSave">Continue</button>
+        </div>
+
+
         
         <div id="appContent">
             <button id="logoutBtn" type="button">Log out</button>
@@ -33,7 +58,7 @@
 
         <h1>Finance Flow</h1>
         <p class="sub">A running record of cash flow</p>
-                <div class="summary">
+            <div class="summary">
             <div class="sum-cell">
                 <div class="sum-label">Revenue</div>
                 <div class="sum-val income" id="sumIncome">£0.00</div>
@@ -41,21 +66,16 @@
             <div class="sum-cell">
                 <div class="sum-label">Costs</div>
                 <div class="sum-val expense" id="sumExpense">£0.00</div>
+                <div class="budget-warn" id="budgetWarn"></div>
             </div>
             <div class="sum-cell">
                 <div class="sum-label">Net</div>
                 <div class="sum-val" id="sumNet">£0.00</div>
             </div>
             <div class="sum-cell">
-                <div class="sum-label">Budget</div>
+                <div class="sum-label">Budget (optional)</div>
                 <input type="number" id="budgetInput" class="budget-input" min="0" step="0.01" placeholder="None">
             </div>
-            <div class="sum-cell">
-                <div class="sum-label">Costs</div>
-                <div class="sum-val expense" id="sumExpense">£0.00</div>
-                <div class="budget-warn" id="budgetWarn"></div>
-            </div>
-
         </div>
 
         <section>
@@ -78,16 +98,7 @@
                 </div>
                 <div class="field cat">
                     <label>Category</label>
-                    <select id="fCat">
-                        <option value="Payroll">Payroll</option>
-                        <option value="Rent">Rent</option>
-                        <option value="Supplies">Supplies</option>
-                        <option value="Marketing">Marketing</option>
-                        <option value="Software">Software</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Taxes">Taxes</option>
-                        <option value="Other">Other</option>
-                    </select>
+                    <select id="fCat"></select>
                 </div>
                 <div class="field amt">
                     <label>Amount</label>
