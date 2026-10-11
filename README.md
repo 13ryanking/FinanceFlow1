@@ -11,7 +11,7 @@ A budgeting web app for small businesses. Log revenue and costs, see where the m
 ![Login screen]
 ![Log In Screen](Screenshots/image.png)
 ![Dashboard](Screenshots/image1.png)
-![Budget Warning](Screenshots/image2.pngimage-1.png)
+![Budget Warning](Screenshots/image2.png)
 
 
 ## Features
