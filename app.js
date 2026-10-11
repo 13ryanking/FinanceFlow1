@@ -455,6 +455,46 @@ budgetEl.addEventListener('change', async () => {
     }
 });
 
+// ---------- Export ----------
+function csvCell(value) {
+    let s = String(value);
+    // stop spreadsheets treating text as a formula (e.g. a description starting with "=")
+    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return '"' + s.replace(/"/g, '""') + '"';
+}
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+    if (entries.length === 0) {
+        showConfirm('Nothing to export', 'Add a transaction first, then try again.', 'OK');
+        return;
+    }
+
+    const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date) || a.id - b.id);
+    const rows = [['Date', 'Description', 'Type', 'Category', 'Amount (GBP)']];
+
+    sorted.forEach(e => {
+        rows.push([
+            e.date,
+            e.desc,
+            e.type === 'income' ? 'Revenue' : 'Cost',
+            e.category,
+            e.amount.toFixed(2)
+        ]);
+    });
+
+    const csv = rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `financeflow-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+});
+
 // ---------- Init ----------
 document.getElementById('fDate').valueAsDate = new Date();
 render();
