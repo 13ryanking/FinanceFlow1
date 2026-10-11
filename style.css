@@ -484,3 +484,12 @@
     padding: 0;
     margin: 12px 14px 0 0;
 }
+
+#authScreen h1 { text-align: center; }
+
+.auth-sub {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin: 0 0 20px;
+}
