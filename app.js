@@ -78,6 +78,12 @@ document.getElementById('authForm').addEventListener('submit', (ev) => {
         : auth.createUserWithEmailAndPassword(email, password);
 
     action.catch((err) => {
+        if (!isLoginMode && cred.user && !cred.user.emailVerified) {
+            return cred.user.sendEmailVerification().catch(() => {
+                document.getElementById('verifyMsg').textContent =
+                    'Could not send the email. Use "Resend email" below.';
+                });
+        }    
         errorEl.textContent = err.message;
     });
 });
@@ -86,16 +92,43 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
     auth.signOut();
 });
 
-auth.onAuthStateChanged(async (user) => {
-    if (!user) {
-        currentUid = null;
-        entries = [];
-        budget = null;
-        categories = [...DEFAULT_CATEGORIES];
-        showScreen('auth');
-        return;
-    }
+document.getElementById('verifyLogout').addEventListener('click', () => {
+    auth.signOut();
+});
 
+document.getElementById('verifyResend').addEventListener('click', async () => {
+    const msg = document.getElementById('verifyMsg');
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        await user.sendEmailVerification();
+        msg.textContent = 'Verification email sent again. Check your inbox and spam folder.';
+    } catch (e) {
+        msg.textContent = e.code === 'auth/too-many-requests'
+            ? 'Too many requests. Wait a few minutes and try again.'
+            : 'Could not send the email. Please try again.';
+    }
+});
+
+document.getElementById('verifyDone').addEventListener('click', async () => {
+    const msg = document.getElementById('verifyMsg');
+    const user = auth.currentUser;
+    if (!user) return;
+    try {
+        await user.reload();
+        if (user.emailVerified) {
+            await user.getIdToken(true); // refresh so Firestore sees the verified status
+            enterApp(user);
+        } else {
+            msg.textContent = 'Not verified yet. Click the link in the email first.';
+        }
+    } catch (e) {
+        console.error('Verification check failed', e);
+        msg.textContent = 'Could not check. Please try again.';
+    }
+});
+
+async function enterApp(user) {
     currentUid = user.uid;
     try {
         const saved = await loadUserData(user.uid);
@@ -117,6 +150,29 @@ auth.onAuthStateChanged(async (user) => {
         document.getElementById('authError').textContent = 'Could not load your data. Check your connection and try again.';
         auth.signOut();
     }
+}
+
+auth.onAuthStateChanged((user) => {
+    if (!user) {
+        currentUid = null;
+        entries = [];
+        budget = null;
+        categories = [...DEFAULT_CATEGORIES];
+        showScreen('auth');
+        return;
+    }
+
+    currentUid = user.uid;
+
+    if (!user.emailVerified) {
+        document.getElementById('verifyText').textContent =
+            `We sent a verification link to ${user.email}. Click it, then come back here. Check your spam folder if it doesn't arrive.`;
+        document.getElementById('verifyMsg').textContent = '';
+        showScreen('verify');
+        return;
+    }
+
+    enterApp(user);
 });
 
 // ---------- Categories ----------
@@ -133,6 +189,7 @@ function populateCategorySelect() {
 
 function showScreen(name) {
     document.getElementById('authScreen').style.display = name === 'auth' ? 'block' : 'none';
+    document.getElementById('verifyScreen').style.display = name === 'verify' ? 'block' : 'none';
     document.getElementById('setupScreen').style.display = name === 'setup' ? 'block' : 'none';
     document.getElementById('appContent').style.display = name === 'app' ? 'block' : 'none';
 }
